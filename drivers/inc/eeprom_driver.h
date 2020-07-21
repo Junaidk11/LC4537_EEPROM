@@ -16,6 +16,7 @@
 
 #include "ti_fee.h"
 #include "HL_sys_common.h"
+#include "HL_hal_stdtypes.h"
 
 
 /*
@@ -77,10 +78,7 @@ uint8_t eeprom_erase(uint16_t eepromNumber, uint16_t dataBlock);
  */
 uint8_t eeprom_format(uint32_t formatCode);
 
-/*
- *  EEPROM error handling
- */
-uint8_t eeprom_errorHandling(uint8_t errorCode);
+void eepromBlockingMain();
 
 
 #endif /* DRIVERS_INC_EEPROM_DRIVER_H_ */

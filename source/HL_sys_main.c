@@ -43,7 +43,9 @@
 
 
 /* USER CODE BEGIN (0) */
-#include "ti_fee.h"
+//#include "ti_fee.h"
+
+#include "../drivers/inc/eeprom_driver.h"
 /* USER CODE END */
 
 /* Include Files */
@@ -102,18 +104,24 @@ void main(void)
     for(loop=0;loop<8;loop++)SpecialRamBlock[loop] = loop;
 
     /* Initialize FEE. This will create Virtual sectors, initialize global variables etc.*/
-    TI_Fee_Init();
-    do
+    //TI_Fee_Init();
+
+
+    eeprom_Init();
+    //eepromBlockingMain();
+    /*do
     {
         TI_Fee_MainFunction();
         delay();
         Status=TI_Fee_GetStatus(0 );
     }
-    while(Status!= IDLE);
+    while(Status!= IDLE);*/
+
 
     /* Write the block into EEP Asynchronously. Block size is configured in ti_fee_cfg.c file. Default Block size is
        8 bytes */
     BlockNumber=0x1;
+    /*
     TI_Fee_WriteAsync(BlockNumber, &SpecialRamBlock[0]);
     do
     {
@@ -121,22 +129,27 @@ void main(void)
         delay();
         Status=TI_Fee_GetStatus(0);
     }
-    while(Status!=IDLE);
+    while(Status!=IDLE);*/
+
+    eeprom_write(0, BlockNumber, &SpecialRamBlock[0], 1);
 
     /* Write the block into EEP Synchronously. Write will not happen since data is same. */
-    TI_Fee_WriteSync(BlockNumber, &SpecialRamBlock[0]);
+    /*
+    TI_Fee_WriteSync(BlockNumber, &SpecialRamBlock[0]); */
 
     /* Read the block with unknown length */
      BlockOffset = 0;
      Length = 0xFFFF;
      oResult=TI_Fee_Read(BlockNumber,BlockOffset,Read_Ptr,Length);
-     do
+     eepromBlockingMain();
+
+     /*do
      {
          TI_Fee_MainFunction();
          delay();
          Status=TI_Fee_GetStatus(0);
      }
-    while(Status!=IDLE);
+    while(Status!=IDLE);*/
 
     /* Invalidate a written block
     TI_Fee_InvalidateBlock(BlockNumber);
@@ -147,7 +160,7 @@ void main(void)
         Status=TI_Fee_GetStatus(0);
     }
     while(Status!=IDLE); */
-
+     /*
      // Initialize RAM 2
      for(loop=0;loop<8;loop++)SpecialRamBlock1[loop] = loop+2;
 
@@ -159,9 +172,10 @@ void main(void)
          delay();
          Status = TI_Fee_GetStatus(0);
      }while(Status!=IDLE);
-
+    */
 
     /* Format bank 7 */
+    while(TI_Fee_GetStatus(0)!= IDLE);
     TI_Fee_Format(0xA5A5A5A5U);
 
     while(1);

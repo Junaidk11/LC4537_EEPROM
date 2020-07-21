@@ -10,7 +10,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROGRAM.TMS570LC43xx.ccxml.Texas Instruments XDS110 USB Debug Probe/CortexR5" value="${build_artifact:LC4537_EEPROM}"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.TMS570LC43xx.ccxml.Texas Instruments XDS110 USB Debug Probe/CortexR5" value="LC4537_EEPROM"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:LC4537_EEPROM}"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.TMS570LC43xx.ccxml.Texas Instruments XDS110 USB Debug Probe/CortexR5" value="C:/Users\Junaid\Desktop\workspace_2\Project\LC4537_EEPROM\Debug\LC4537_EEPROM.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.TMS570LC43xx.ccxml.Texas Instruments XDS110 USB Debug Probe/CortexR5" value="C:/Users\Junaid\Documents\LC4537_EEPROM\Debug\LC4537_EEPROM.out"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/LC4537_EEPROM"/>
 </listAttribute>
