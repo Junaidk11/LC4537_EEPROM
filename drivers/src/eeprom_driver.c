@@ -213,8 +213,59 @@ uint8_t eeprom_write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBu
     return ((uint8_t)jobScheduled);
 
 }
+
+/*******************************************************************
+* NAME :            eeprom_read
+*
+* DESCRIPTION :     Read Data from a Data Block of a given EEPROM
+*
+* INPUTS : @param1: EEP0/EEP1
+*          @param2: DATA_BLOCK_x
+*          @param3: Offset from start of Data Block
+*          @param4: pointer to buffer that will store data the read from the DATA_BLOCK_x
+*          @param5: Length of Data Block / if Length Unknown set this to 0xFFFF
+*          @param5: ASYNC/SYNC
+*
+*
+* RETURN : E_OK/E_NOT_OK -> Job Scheduled/Completed OR Job Not-Scheduled/Completion Failed
+*
+*
+* NOTES :  None
+*
+*/
 uint8_t eeprom_read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t startingAddress, uint8_t *pRecieveBuffer, uint16_t dataBlockLength, uint8_t sync_or_async);
+
+/*******************************************************************
+* NAME :            eeprom_erase
+*
+* DESCRIPTION :     Erase a given Data block asynchronously
+*
+* INPUTS : @param1: EEP0/EEP1
+*          @param2: DATA_BLOCK_x
+*
+* RETURN : E_OK/E_NOT_OK -> Job Scheduled/Completed OR Job Not-Scheduled/Completion Failed
+*
+*
+* NOTES :  None
+*
+*/
 uint8_t eeprom_erase(uint16_t eepromNumber, uint16_t dataBlock);
+
+/*******************************************************************
+* NAME :            eeprom_format
+*
+* DESCRIPTION :     Format EEPROM Bank 7
+*
+* INPUTS : @param1: BANK7_FORMAT_CODE --> Defined in header file
+*
+*
+*
+* RETURN : E_OK/E_NOT_OK -> Job Scheduled/Completed OR Job Not-Scheduled/Completion Failed
+*
+*
+* NOTES :  None
+*
+*/
 uint8_t eeprom_format(uint32_t formatCode);
 
 
