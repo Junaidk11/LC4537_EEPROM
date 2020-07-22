@@ -61,7 +61,7 @@ void eepromBlockingMain(){
 
 void eeprom_Init(){
 
-    // Call TI Fee Init API to initialize Fee
+    // Call TI Fee x  API to initialize Fee
     TI_Fee_Init();
 
     // Periodically call TI_Fee_MainFunction() to initialize the FEE, for now we use software delay, will add Timer Interrupt for every 2-5ms
@@ -310,21 +310,81 @@ uint8_t eeprom_erase(uint16_t dataBlock){
 /*******************************************************************
 * NAME :            eeprom_format
 *
-* DESCRIPTION :     Format EEPROM Bank 7
+* DESCRIPTION :    Synchronous formating of emulated flash.
+*                   FORMAT_CONFIGURED_SECTORS_ONLY will format ONLY configured sectors.
+*                   FORMAT_EEPROM_BANK7  will format the entire  EEPROM Bank
 *
-* INPUTS : @param1: BANK7_FORMAT_CODE --> Defined in header file
+* INPUTS :  @param1: EEP0/EEP1
+*           @param2: Format code is one of the Following:
+*                               FORMAT_CONFIGURED_SECTORS_ONLY
+*                               FORMAT_EEPROM_BANK7
 *
 *
 *
 * RETURN : E_OK/E_NOT_OK -> Job Scheduled/Completed OR Job Not-Scheduled/Completion Failed
 *
 *
-* NOTES :  None
+* NOTES : For "FORMAT_CONFIGURED_SECTORS_ONLY", FEE needs to be initialized.
+*         For "FORMAT_EEPROM_BANK7" FEE doesn't need to be initialized.
+*
+*         This function should be called only if you want to reconfigure the Data Blocks/Virtual Sectors or detect a serious error condition.
 *
 */
-uint8_t eeprom_format(uint32_t formatCode){
+uint8_t eeprom_format(uint16_t eepromNumber, uint32_t formatCode){
 
-    return ((uint8_t)TI_Fee_Format(formatCode));
+    bool formatResult = false;
+    Std_ReturnType jobScheduled = E_NOT_OK;
+
+    if (formatCode== FORMAT_EEPROM_BANK7){
+
+        // Don't need to check if FEE initialized.
+        formatResult = TI_Fee_Format(formatCode);
+
+        if(formatResult == true ){
+               //Format successful - Do nothing -> Can add some flag, if need be
+
+        }else{
+                // Format Job failed - Determine error
+            if(TI_Fee_GetJobResult((uint8)eepromNumber) == JOB_OK){
+                           // If format failed, then this block won't enter, will remove  later, it is redundant.
+
+            }else if(TI_Fee_GetJobResult((uint8)eepromNumber) == JOB_FAILED){
+
+                // Error Recovery
+                Fee_ErrorCodeType errorCode = TI_FeeErrorCode((uint8)eepromNumber);
+                jobScheduled = eeprom_errorHandling(errorCode);
+           }
+        }
+
+    }else if(formatCode== FORMAT_CONFIGURED_SECTORS_ONLY){
+
+        // Need to check if the FEE module has been initialized before calling TI_Fee_Format with code.
+
+        if(TI_Fee_GetStatus((uint8)eepromNumber)!= UNINIT && TI_Fee_GetStatus((uint8)eepromNumber)== IDLE){
+
+               // Now we can call TI Format with key
+            formatResult = TI_Fee_Format(formatCode);
+            if(formatResult == true ){
+                           //Format successful - Do nothing -> Can add some flag, if need be
+
+            }else{
+                    // Format Job failed - Determine error
+                if(TI_Fee_GetJobResult((uint8)eepromNumber) == JOB_OK){
+                               // If format failed, then this block won't enter, will remove  later, it is redundant.
+
+                }else if(TI_Fee_GetJobResult((uint8)eepromNumber) == JOB_FAILED){
+
+                    // Error Recovery
+                    Fee_ErrorCodeType errorCode = TI_FeeErrorCode((uint8)eepromNumber);
+                    jobScheduled = eeprom_errorHandling(errorCode);
+               }
+            }
+
+        }
+
+    }
+
+    return (uint8_t)(jobScheduled);
 }
 
 

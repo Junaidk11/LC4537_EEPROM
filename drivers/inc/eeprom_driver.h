@@ -47,8 +47,10 @@
 
 /*
  *  Format EEPROM Bank - Need to send following code
+ *  @FormatCode
  */
-#define BANK7_FORMAT_CODE 0xA5A5A5A5U
+#define FORMAT_CONFIGURED_SECTORS_ONLY    0xA5A5A5A5U
+#define FORMAT_EEPROM_BANK7               0x5A5A5A5AU
 /*
  *  Supported APIs
  */
@@ -76,7 +78,7 @@ uint8_t eeprom_erase(uint16_t dataBlock);
 /*
  *  Call this functions to format Flash Bank 7
  */
-uint8_t eeprom_format(uint32_t formatCode);
+uint8_t eeprom_format(uint16_t eepromNumber, uint32_t formatCode);
 
 void eepromBlockingMain();
 
