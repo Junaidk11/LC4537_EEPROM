@@ -295,7 +295,7 @@ uint8_t eeprom_erase(uint16_t dataBlock){
 
    Std_ReturnType jobScheduled = E_OK;
 
-   jobScheduled = TI_Fee_EraseImmediateBlock(dataBlock));
+   jobScheduled = TI_Fee_EraseImmediateBlock(dataBlock);
 
    if(jobScheduled == E_OK){
        // Job Accepted by the TI Fee Module. Need to Call eeprom_BlockingMain periodically to finish job
@@ -304,7 +304,7 @@ uint8_t eeprom_erase(uint16_t dataBlock){
        // Job Not Accepted by the TI Fee Module. Do Something
        jobScheduled = E_NOT_OK;
    }
-   return (uint8_t(jobScheduled));
+   return ((uint8_t)(jobScheduled));
 }
 
 /*******************************************************************
