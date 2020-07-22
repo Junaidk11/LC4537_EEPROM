@@ -233,7 +233,49 @@ uint8_t eeprom_write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBu
 * NOTES :  None
 *
 */
-uint8_t eeprom_read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t startingAddress, uint8_t *pRecieveBuffer, uint16_t dataBlockLength, uint8_t sync_or_async);
+uint8_t eeprom_read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t startingAddress, uint8_t *pRecieveBuffer, uint16_t dataBlockLength, uint8_t sync_or_async){
+
+        Std_ReturnType jobScheduled = E_OK;
+        if(sync_or_async == ASYNC){
+
+            jobScheduled = TI_Fee_Read(dataBlock, startingAddress, pRecieveBuffer, dataBlockLength);
+            if(jobScheduled == E_OK){
+                  /* Do nothing as Job scheduled successfully. */
+                jobScheduled = E_OK;
+            }else if(jobScheduled == E_NOT_OK){
+
+                /* Do something -> Will updated later*/
+                jobScheduled = E_NOT_OK;
+            }
+
+        }else if(sync_or_async == SYNC){
+
+            jobScheduled = TI_Fee_ReadSync(dataBlock, startingAddress, pRecieveBuffer, dataBlockLength);
+
+            if(jobScheduled == E_OK){
+
+                // Check if Job Successful
+                if(TI_Fee_GetJobResult(eepromNumber) == JOB_OK){
+                       /*  Job completed. DO nothing*/
+                    jobScheduled = E_OK;
+                }else if(TI_Fee_GetJobResult(eepromNumber) == JOB_FAILED){
+                      /* Get Last Job Error */
+
+                    Fee_ErrorCodeType errorCode = TI_FeeErrorCode(eepromNumber);
+                    jobScheduled = eeprom_errorHandling(errorCode);
+
+                }
+
+            }else if(jobScheduled == E_NOT_OK){
+                // Job Not accepted by the Fee Module -> DO something.
+                jobScheduled = E_NOT_OK; // For Synchronous Job request not accepted, what are the possibilities?
+            }
+
+       }
+
+        return ((uint8_t)jobScheduled);
+
+}
 
 /*******************************************************************
 * NAME :            eeprom_erase
@@ -249,7 +291,21 @@ uint8_t eeprom_read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t starting
 * NOTES :  None
 *
 */
-uint8_t eeprom_erase(uint16_t eepromNumber, uint16_t dataBlock);
+uint8_t eeprom_erase(uint16_t dataBlock){
+
+   Std_ReturnType jobScheduled = E_OK;
+
+   jobScheduled = TI_Fee_EraseImmediateBlock(dataBlock));
+
+   if(jobScheduled == E_OK){
+       // Job Accepted by the TI Fee Module. Need to Call eeprom_BlockingMain periodically to finish job
+       jobScheduled = E_OK;
+   }else if(jobScheduled == E_NOT_OK){
+       // Job Not Accepted by the TI Fee Module. Do Something
+       jobScheduled = E_NOT_OK;
+   }
+   return (uint8_t(jobScheduled));
+}
 
 /*******************************************************************
 * NAME :            eeprom_format
@@ -266,6 +322,9 @@ uint8_t eeprom_erase(uint16_t eepromNumber, uint16_t dataBlock);
 * NOTES :  None
 *
 */
-uint8_t eeprom_format(uint32_t formatCode);
+uint8_t eeprom_format(uint32_t formatCode){
+
+    return ((uint8_t)TI_Fee_Format(formatCode));
+}
 
 

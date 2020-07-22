@@ -71,7 +71,7 @@ uint8_t eeprom_write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBu
 uint8_t eeprom_read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t startingAddress, uint8_t *pRecieveBuffer, uint16_t dataBlockLength, uint8_t sync_or_async);
 
 
-uint8_t eeprom_erase(uint16_t eepromNumber, uint16_t dataBlock);
+uint8_t eeprom_erase(uint16_t dataBlock);
 
 /*
  *  Call this functions to format Flash Bank 7
