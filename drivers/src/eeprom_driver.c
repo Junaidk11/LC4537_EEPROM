@@ -153,7 +153,7 @@ Std_ReturnType eeprom_ErrorHandling(Fee_ErrorCodeType errorCode){
 }
 
 /*******************************************************************
-* NAME :            eeprom_write
+* NAME :            eeprom_Write
 *
 * DESCRIPTION :     Write Information to given Data Block
 *
@@ -199,7 +199,7 @@ uint8_t eeprom_Write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBu
                   /* Get Last Job Error */
 
                 Fee_ErrorCodeType errorCode = TI_FeeErrorCode(eepromNumber);
-                jobScheduled = eeprom_errorHandling(errorCode);
+                jobScheduled = eeprom_ErrorHandling(errorCode);
 
             }
 
@@ -214,7 +214,7 @@ uint8_t eeprom_Write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBu
 }
 
 /*******************************************************************
-* NAME :            eeprom_read
+* NAME :            eeprom_Read
 *
 * DESCRIPTION :     Read Data from a Data Block of a given EEPROM
 *
@@ -261,7 +261,7 @@ uint8_t eeprom_Read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t starting
                       /* Get Last Job Error */
 
                     Fee_ErrorCodeType errorCode = TI_FeeErrorCode(eepromNumber);
-                    jobScheduled = eeprom_errorHandling(errorCode);
+                    jobScheduled = eeprom_ErrorHandling(errorCode);
 
                 }
 
@@ -307,7 +307,7 @@ uint8_t eeprom_Erase(uint16_t dataBlock){
 }
 
 /*******************************************************************
-* NAME :            eeprom_format
+* NAME :            eeprom_Format
 *
 * DESCRIPTION :    Synchronous formating of emulated flash.
 *                   FORMAT_CONFIGURED_SECTORS_ONLY will format ONLY configured sectors.
@@ -351,7 +351,7 @@ uint8_t eeprom_Format(uint16_t eepromNumber, uint32_t formatCode){
 
                 // Error Recovery
                 Fee_ErrorCodeType errorCode = TI_FeeErrorCode((uint8)eepromNumber);
-                jobScheduled = eeprom_errorHandling(errorCode);
+                jobScheduled = eeprom_ErrorHandling(errorCode);
            }
         }
 
@@ -375,7 +375,7 @@ uint8_t eeprom_Format(uint16_t eepromNumber, uint32_t formatCode){
 
                     // Error Recovery
                     Fee_ErrorCodeType errorCode = TI_FeeErrorCode((uint8)eepromNumber);
-                    jobScheduled = eeprom_errorHandling(errorCode);
+                    jobScheduled = eeprom_ErrorHandling(errorCode);
                }
             }
 

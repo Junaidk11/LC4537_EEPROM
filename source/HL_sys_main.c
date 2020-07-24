@@ -110,11 +110,11 @@ void main(void)
     eeprom_Init();
 
     // Format Flash Bank 7 -> Just for TMS570LC4357,  has connection issues, want to start with a clean Bank to establish Connection.
-    jobStatus = eeprom_format(EEP0, FORMAT_EEPROM_BANK7);
+    jobStatus = eeprom_Format(EEP0, FORMAT_EEPROM_BANK7);
 
 
 
-    eeprom_write(EEP0, DATA_BLOCK_1, &SpecialRamBlock[0], SYNC);
+    eeprom_Write(EEP0, DATA_BLOCK_1, &SpecialRamBlock[0], SYNC);
 
 
     /*
@@ -123,7 +123,7 @@ void main(void)
     /* Read the block with unknown length */
      //BlockOffset = 2; // Read from 02->07, Last 2 Bytes will 'FF'  'FF'
 
-     jobStatus = eeprom_read(EEP0, DATA_BLOCK_1, 0, Read_Ptr, UNKNOWN_BLOCK_LENGTH, SYNC);
+     jobStatus = eeprom_Read(EEP0, DATA_BLOCK_1, 0, Read_Ptr, UNKNOWN_BLOCK_LENGTH, SYNC);
 
 
 
