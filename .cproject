@@ -159,6 +159,6 @@
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="LC4537_EEPROM.com.ti.ccstudio.buildDefinitions.TMS470.ProjectType.744938747" name="TMS470" projectType="com.ti.ccstudio.buildDefinitions.TMS470.ProjectType"/>
 	</storageModule>
-	<storageModule moduleId="scannerConfiguration"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="scannerConfiguration"/>
 </cproject>

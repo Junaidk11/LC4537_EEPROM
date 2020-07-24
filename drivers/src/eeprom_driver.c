@@ -75,26 +75,26 @@ void eeprom_Init(){
 * DESCRIPTION :     Function used for recovering from severe errors
 *
 * INPUTS : @param1:  one of the following:
-*                       Error_Nil=0U,
-                        Error_TwoActiveVS=1U,
-                        Error_TwoCopyVS=2U,
-                        Error_SetupStateMachine=3U,
-                        Error_CopyButNoActiveVS=4U,
-                        Error_NoActiveVS=5U,
-                        Error_BlockInvalid=6U,
-                        Error_NullDataPtr=7U,
-                        Error_NoFreeVS=8U,
-                        Error_InvalidVirtualSectorParameter=9U,
-                        Error_ExceedSectorOnBank=10U,
-                        Error_EraseVS=11U,
-                        Error_BlockOffsetGtBlockSize=12U,
-                        Error_LengthParam=13U,
-                        Error_FeeUninit=14U,
-                        Error_Suspend=15U,
-                        Error_InvalidBlockIndex=16U,
-                        Error_NoErase=17U,
-                        Error_CurrentAddress=18U,
-                        Error_Exceed_No_Of_DataSets=19U
+*                       Error_Nil=0U                           ->                  No ERROR
+                        Error_TwoActiveVS=1U                   ->                  There are two active Virtual sectors. This error will not happen with modified design.
+                        Error_TwoCopyVS=2U                     ->                  There are two copy Virtual sectors. This error will not happen with modified design.
+                        Error_SetupStateMachine=3U             ->                  Either HCLK or EWAIT are not configured correctly or there is OTP error.
+                        Error_CopyButNoActiveVS=4U             ->                  There is a copy Virtual sector but no Active sector or ready for erase sector.
+                        Error_NoActiveVS=5U                    ->                  FEE was not able to find/create an active Virtual Sector.
+                        Error_BlockInvalid=6U                  ->                  Invalid Block passed as input.
+                        Error_NullDataPtr=7U                   ->                  Null Data ptr passed as input.
+                        Error_NoFreeVS=8U                      ->                  No more Free Virtual Sector present to write data. This error will not happen with modified design.
+                        Error_InvalidVirtualSectorParameter=9U ->                  This is deprecated.
+                        Error_ExceedSectorOnBank=10U,          ->
+                        Error_EraseVS=11U,                     ->                  Blank check failed after erase.
+                        Error_BlockOffsetGtBlockSize=12U,      ->                  Block Offset is not valid.
+                        Error_LengthParam=13U,                 ->                  Length Parameter is not valid.
+                        Error_FeeUninit=14U,                   ->                  FEE if not initialized.
+                        Error_Suspend=15U,                     ->                  This is deprecated.
+                        Error_InvalidBlockIndex=16U,           ->                  Block index is invalid.
+                        Error_NoErase=17U,                     ->                  This is deprecated.
+                        Error_CurrentAddress=18U,              ->                  Address of block is not valid.
+                        Error_Exceed_No_Of_DataSets=19U        ->                  Data sets not configured correctly.
 *
 *
 *
@@ -104,7 +104,7 @@ void eeprom_Init(){
 * NOTES :
 *
 */
-Std_ReturnType eeprom_errorHandling(Fee_ErrorCodeType errorCode){
+Std_ReturnType eeprom_ErrorHandling(Fee_ErrorCodeType errorCode){
 
     Std_ReturnType errorRecoveryResult = E_NOT_OK;
     if (errorCode == Error_Nil){
@@ -166,11 +166,11 @@ Std_ReturnType eeprom_errorHandling(Fee_ErrorCodeType errorCode){
 * RETURN : E_OK/E_NOT_OK -> Job Scheduled/Completed OR Job Not-Scheduled/Completion Failed
 *
 *
-* NOTES :  Job Scheduled and Job Not-Scheduled is for ASYNCHRONOUS job requests made to FEE
-*          Job Completed and Job Failed are for SYNCHRONOUS job requests made to FEE.
+* NOTES :  1) Job Scheduled and Job Not-Scheduled is for ASYNCHRONOUS job requests made to FEE, Job Completed and Job Failed are for SYNCHRONOUS job requests made to FEE.
+*          2) When writing a Data block into EEP Synchronously -> Write will not happen if the Data being written is same as Data  already in the block.
 *
 */
-uint8_t eeprom_write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBuffer, uint8_t sync_or_async){
+uint8_t eeprom_Write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBuffer, uint8_t sync_or_async){
 
     Std_ReturnType jobScheduled = E_OK;
     if(sync_or_async == ASYNC){
@@ -207,7 +207,6 @@ uint8_t eeprom_write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBu
             // Job Not accepted by the Fee Module -> DO something.
             jobScheduled = E_NOT_OK; // For Synchronous Job request not accepted, what are the possibilities?
         }
-
    }
 
     return ((uint8_t)jobScheduled);
@@ -221,9 +220,9 @@ uint8_t eeprom_write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBu
 *
 * INPUTS : @param1: EEP0/EEP1
 *          @param2: DATA_BLOCK_x
-*          @param3: Offset from start of Data Block
+*          @param3: Offset from start of Data Block - in  BYTES
 *          @param4: pointer to buffer that will store data the read from the DATA_BLOCK_x
-*          @param5: Length of Data Block / if Length Unknown set this to 0xFFFF
+*          @param5: Length of Data Block / if Length Unknown set this to 'UNKNOWN_BLOCK_LENGTH'
 *          @param5: ASYNC/SYNC
 *
 *
@@ -233,7 +232,7 @@ uint8_t eeprom_write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBu
 * NOTES :  None
 *
 */
-uint8_t eeprom_read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t startingAddress, uint8_t *pRecieveBuffer, uint16_t dataBlockLength, uint8_t sync_or_async){
+uint8_t eeprom_Read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t startingAddress, uint8_t *pRecieveBuffer, uint16_t dataBlockLength, uint8_t sync_or_async){
 
         Std_ReturnType jobScheduled = E_OK;
         if(sync_or_async == ASYNC){
@@ -291,7 +290,7 @@ uint8_t eeprom_read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t starting
 * NOTES :  None
 *
 */
-uint8_t eeprom_erase(uint16_t dataBlock){
+uint8_t eeprom_Erase(uint16_t dataBlock){
 
    Std_ReturnType jobScheduled = E_OK;
 
@@ -330,7 +329,7 @@ uint8_t eeprom_erase(uint16_t dataBlock){
 *         This function should be called only if you want to reconfigure the Data Blocks/Virtual Sectors or detect a serious error condition.
 *
 */
-uint8_t eeprom_format(uint16_t eepromNumber, uint32_t formatCode){
+uint8_t eeprom_Format(uint16_t eepromNumber, uint32_t formatCode){
 
     bool formatResult = false;
     Std_ReturnType jobScheduled = E_NOT_OK;
@@ -386,5 +385,31 @@ uint8_t eeprom_format(uint16_t eepromNumber, uint32_t formatCode){
 
     return (uint8_t)(jobScheduled);
 }
+
+/*******************************************************************
+* NAME :            eeprom_Status
+*
+* DESCRIPTION :     Return current State of Flash Bank 7 -> Emulated EEPROM Bank
+*
+* INPUTS : @param1: EEP0/EEP1
+*
+*
+* RETURN : One of the following:
+*                       UNINIT
+                        IDLE
+                        BUSY
+                        BUSY_INTERNAL
+*
+*
+*
+* NOTES :  None
+*
+*/
+
+TI_FeeModuleStatusType eeprom_Status(uint16_t eepromNumber){
+
+    return(TI_Fee_GetStatus(eepromNumber));
+}
+
 
 

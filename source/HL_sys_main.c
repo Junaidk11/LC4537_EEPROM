@@ -98,8 +98,7 @@ void delay(void)
 void main(void)
 {
 /* USER CODE BEGIN (3) */
-    unsigned int BlockNumber;
-    unsigned int BlockOffset, Length;
+    //unsigned int BlockOffset, Length;
     unsigned char *Read_Ptr=read_data;
 
     unsigned int loop;
@@ -108,55 +107,26 @@ void main(void)
     for(loop=0;loop<8;loop++)SpecialRamBlock[loop] = loop;
 
     /* Initialize FEE. This will create Virtual sectors, initialize global variables etc.*/
-    //TI_Fee_Init();
-
-
     eeprom_Init();
 
-    jobStatus = eeprom_format(EEP0, FORMAT_EEPROM_BANK7);  // Format EEPROM 0 -> Just for TMS570LC4357,  has connection issues.
-
-    //eepromBlockingMain();
-    /*do
-    {
-        TI_Fee_MainFunction();
-        delay();
-        Status=TI_Fee_GetStatus(0 );
-    }
-    while(Status!= IDLE);*/
+    // Format Flash Bank 7 -> Just for TMS570LC4357,  has connection issues, want to start with a clean Bank to establish Connection.
+    jobStatus = eeprom_format(EEP0, FORMAT_EEPROM_BANK7);
 
 
-    /* Write the block into EEP Asynchronously. Block size is configured in ti_fee_cfg.c file. Default Block size is
-       8 bytes */
-    BlockNumber=0x1;
-    /*
-    TI_Fee_WriteAsync(BlockNumber, &SpecialRamBlock[0]);
-    do
-    {
-        TI_Fee_MainFunction();
-        delay();
-        Status=TI_Fee_GetStatus(0);
-    }
-    while(Status!=IDLE);*/
 
-    eeprom_write(0, BlockNumber, &SpecialRamBlock[0], 1);
+    eeprom_write(EEP0, DATA_BLOCK_1, &SpecialRamBlock[0], SYNC);
 
-    /* Write the block into EEP Synchronously. Write will not happen since data is same. */
+
     /*
     TI_Fee_WriteSync(BlockNumber, &SpecialRamBlock[0]); */
 
     /* Read the block with unknown length */
-     BlockOffset = 0;
-     Length = 0xFFFF;
-     oResult=TI_Fee_Read(BlockNumber,BlockOffset,Read_Ptr,Length);
-     eepromBlockingMain();
+     //BlockOffset = 2; // Read from 02->07, Last 2 Bytes will 'FF'  'FF'
 
-     /*do
-     {
-         TI_Fee_MainFunction();
-         delay();
-         Status=TI_Fee_GetStatus(0);
-     }
-    while(Status!=IDLE);*/
+     jobStatus = eeprom_read(EEP0, DATA_BLOCK_1, 0, Read_Ptr, UNKNOWN_BLOCK_LENGTH, SYNC);
+
+
+
 
     /* Invalidate a written block
     TI_Fee_InvalidateBlock(BlockNumber);
@@ -167,19 +137,6 @@ void main(void)
         Status=TI_Fee_GetStatus(0);
     }
     while(Status!=IDLE); */
-     /*
-     // Initialize RAM 2
-     for(loop=0;loop<8;loop++)SpecialRamBlock1[loop] = loop+2;
-
-     BlockNumber = 0x2;
-
-     TI_Fee_WriteAsync(BlockNumber, &SpecialRamBlock[0]);
-     do{
-         TI_Fee_MainFunction();
-         delay();
-         Status = TI_Fee_GetStatus(0);
-     }while(Status!=IDLE);
-    */
 
     /* Format bank 7 */
     while(TI_Fee_GetStatus(0)!= IDLE);
