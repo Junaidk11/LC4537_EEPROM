@@ -57,6 +57,10 @@ uint16 u16JobResult,Status;
 Std_ReturnType oResult=E_OK;
 unsigned char read_data[8]={0};
 
+// Added for TMS570LC4537
+
+uint8_t jobStatus;
+
 uint8 SpecialRamBlock[8];
 uint8 SpecialRamBlock1[8];
 
@@ -108,6 +112,9 @@ void main(void)
 
 
     eeprom_Init();
+
+    jobStatus = eeprom_format(EEP0, FORMAT_EEPROM_BANK7);  // Format EEPROM 0 -> Just for TMS570LC4357,  has connection issues.
+
     //eepromBlockingMain();
     /*do
     {

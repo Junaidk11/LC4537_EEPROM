@@ -33,7 +33,7 @@ void Delay(){
 
 void eepromBlockingMain(){
 
-    uint16_t feeModuleStatus;
+    TI_FeeModuleStatusType feeModuleStatus;
 
     do{
 
