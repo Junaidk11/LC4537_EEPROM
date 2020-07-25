@@ -98,6 +98,24 @@ void delay(void)
 void main(void)
 {
 /* USER CODE BEGIN (3) */
+
+
+    /***
+     *
+     *  Need to come up with a Testing Scenario for testing all the EEPROM Driver functions.
+     *      Need to Format Bank 7 before we Start.
+     *      Format Bank & set a flag to indicate Bank 7 deleted.
+     *      Write This flag + some information into one of the 4 configured DataBlocks of current Active Virtual Sector.
+     *      Test the ASYNC & SYNC write function calls.
+     *      Test the read ASYNC & SYNC function calls.
+     *      Implement the error_handling and recovery Functions.
+     *      Come up with Main Loop that will keep track of the different ASYNC function calls with arguments, and when Emulated EEPROM is in IDLE state, you can call the next ASYNC function call &
+     *          fix any errors that may cause job failure.m
+     *
+     *      Will use software time for now, but will configure a general purpose timer to cause an interrupt every 2-3 milliseconds to carry the scheduled ASYNC job.
+     *
+     *
+     */
     //unsigned int BlockOffset, Length;
     unsigned char *Read_Ptr=read_data;
 
