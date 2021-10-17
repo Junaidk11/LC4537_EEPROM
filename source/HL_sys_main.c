@@ -43,7 +43,9 @@
 
 
 /* USER CODE BEGIN (0) */
-#include "ti_fee.h"
+//#include "ti_fee.h"
+
+#include "../drivers/inc/eeprom_driver.h"
 /* USER CODE END */
 
 /* Include Files */
@@ -54,6 +56,10 @@
 uint16 u16JobResult,Status;
 Std_ReturnType oResult=E_OK;
 unsigned char read_data[8]={0};
+
+// Added for TMS570LC4537
+
+uint8_t jobStatus;
 
 uint8 SpecialRamBlock[8];
 uint8 SpecialRamBlock1[8];
@@ -92,8 +98,25 @@ void delay(void)
 void main(void)
 {
 /* USER CODE BEGIN (3) */
-    unsigned int BlockNumber;
-    unsigned int BlockOffset, Length;
+
+
+    /***
+     *
+     *  Need to come up with a Testing Scenario for testing all the EEPROM Driver functions.
+     *      Need to Format Bank 7 before we Start.
+     *      Format Bank & set a flag to indicate Bank 7 deleted.
+     *      Write This flag + some information into one of the 4 configured DataBlocks of current Active Virtual Sector.
+     *      Test the ASYNC & SYNC write function calls.
+     *      Test the read ASYNC & SYNC function calls.
+     *      Implement the error_handling and recovery Functions.
+     *      Come up with Main Loop that will keep track of the different ASYNC function calls with arguments, and when Emulated EEPROM is in IDLE state, you can call the next ASYNC function call &
+     *          fix any errors that may cause job failure.m
+     *
+     *      Will use software time for now, but will configure a general purpose timer to cause an interrupt every 2-3 milliseconds to carry the scheduled ASYNC job.
+     *
+     *
+     */
+    //unsigned int BlockOffset, Length;
     unsigned char *Read_Ptr=read_data;
 
     unsigned int loop;
@@ -102,41 +125,26 @@ void main(void)
     for(loop=0;loop<8;loop++)SpecialRamBlock[loop] = loop;
 
     /* Initialize FEE. This will create Virtual sectors, initialize global variables etc.*/
-    TI_Fee_Init();
-    do
-    {
-        TI_Fee_MainFunction();
-        delay();
-        Status=TI_Fee_GetStatus(0 );
-    }
-    while(Status!= IDLE);
+    eeprom_Init();
 
-    /* Write the block into EEP Asynchronously. Block size is configured in ti_fee_cfg.c file. Default Block size is
-       8 bytes */
-    BlockNumber=0x1;
-    TI_Fee_WriteAsync(BlockNumber, &SpecialRamBlock[0]);
-    do
-    {
-        TI_Fee_MainFunction();
-        delay();
-        Status=TI_Fee_GetStatus(0);
-    }
-    while(Status!=IDLE);
+    // Format Flash Bank 7 -> Just for TMS570LC4357,  has connection issues, want to start with a clean Bank to establish Connection.
+    jobStatus = eeprom_Format(EEP0, FORMAT_EEPROM_BANK7);
 
-    /* Write the block into EEP Synchronously. Write will not happen since data is same. */
-    TI_Fee_WriteSync(BlockNumber, &SpecialRamBlock[0]);
+
+
+    eeprom_Write(EEP0, DATA_BLOCK_1, &SpecialRamBlock[0], SYNC);
+
+
+    /*
+    TI_Fee_WriteSync(BlockNumber, &SpecialRamBlock[0]); */
 
     /* Read the block with unknown length */
-     BlockOffset = 0;
-     Length = 0xFFFF;
-     oResult=TI_Fee_Read(BlockNumber,BlockOffset,Read_Ptr,Length);
-     do
-     {
-         TI_Fee_MainFunction();
-         delay();
-         Status=TI_Fee_GetStatus(0);
-     }
-    while(Status!=IDLE);
+     //BlockOffset = 2; // Read from 02->07, Last 2 Bytes will 'FF'  'FF'
+
+     jobStatus = eeprom_Read(EEP0, DATA_BLOCK_1, 0, Read_Ptr, UNKNOWN_BLOCK_LENGTH, SYNC);
+
+
+
 
     /* Invalidate a written block
     TI_Fee_InvalidateBlock(BlockNumber);
@@ -148,20 +156,8 @@ void main(void)
     }
     while(Status!=IDLE); */
 
-     // Initialize RAM 2
-     for(loop=0;loop<8;loop++)SpecialRamBlock1[loop] = loop+2;
-
-     BlockNumber = 0x2;
-
-     TI_Fee_WriteAsync(BlockNumber, &SpecialRamBlock[0]);
-     do{
-         TI_Fee_MainFunction();
-         delay();
-         Status = TI_Fee_GetStatus(0);
-     }while(Status!=IDLE);
-
-
     /* Format bank 7 */
+    while(TI_Fee_GetStatus(0)!= IDLE);
     TI_Fee_Format(0xA5A5A5A5U);
 
     while(1);

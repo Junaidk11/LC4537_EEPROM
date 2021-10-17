@@ -16,6 +16,7 @@
 
 #include "ti_fee.h"
 #include "HL_sys_common.h"
+#include "HL_hal_stdtypes.h"
 
 
 /*
@@ -45,42 +46,29 @@
 
 
 /*
- *  Format EEPROM Bank - Need to send following code
+ *  Format Keys
+ *
  */
-#define BANK7_FORMAT_CODE 0xA5A5A5A5U
+#define FORMAT_CONFIGURED_SECTORS_ONLY    0xA5A5A5A5U
+#define FORMAT_EEPROM_BANK7               0x5A5A5A5AU
+
+/*
+ *  Use following Macro Data Block Length is unknown, the FEE API internally get the block length from Data Block header
+ */
+
+#define UNKNOWN_BLOCK_LENGTH    0xFFFFU
+
 /*
  *  Supported APIs
  */
 
-/*
- *  Initialize FEE, create the Virtual Sectors and Add Data Blocks
- */
 void eeprom_Init();
-
-/*
- *  Write to a Data Block using Asynchronous method or synchronous method
- *  Return = Job scheduled successfully or Failed
- */
-uint8_t eeprom_write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBuffer, uint8_t sync_or_async);
-
-/*
- *  Read a given number of bytes from a Data Block of the EEPROM, given the starting Address in the block ; if Block Length unknown = set dataBlockLength to 0xFFFF
- */
-
-uint8_t eeprom_read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t startingAddress, uint8_t *pRecieveBuffer, uint16_t dataBlockLength, uint8_t sync_or_async);
-
-
-uint8_t eeprom_erase(uint16_t eepromNumber, uint16_t dataBlock);
-
-/*
- *  Call this functions to format Flash Bank 7
- */
-uint8_t eeprom_format(uint32_t formatCode);
-
-/*
- *  EEPROM error handling
- */
-uint8_t eeprom_errorHandling(uint8_t errorCode);
-
+void eepromBlockingMain();
+uint8_t eeprom_Write(uint16_t eepromNumber, uint16_t dataBlock, uint8_t *pDataBuffer, uint8_t sync_or_async);
+uint8_t eeprom_Read(uint16_t eepromNumber, uint16_t dataBlock, uint16_t startingAddress, uint8_t *pRecieveBuffer, uint16_t dataBlockLength, uint8_t sync_or_async);
+uint8_t eeprom_Erase(uint16_t dataBlock);
+uint8_t eeprom_Format(uint16_t eepromNumber, uint32_t formatCode);
+uint8_t eeprom_InvalidateBlock(uint16_t eepromNumber, uint32_t dataBlock);
+TI_FeeModuleStatusType eeprom_Status(uint16_t eepromNumber);
 
 #endif /* DRIVERS_INC_EEPROM_DRIVER_H_ */
